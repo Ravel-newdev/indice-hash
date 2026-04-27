@@ -3,23 +3,23 @@
 #include <string.h>
 #include "hash.h"
 
-/* ─────────────────────────────────────────────────────────────
- * main.c — ponto de entrada do índice hash extensível
- *
- * Lê operações de in.txt, executa no índice e escreve out.txt.
- *
- * Formato de in.txt:
- *   PG/<profundidade global inicial>
- *   INC:x | REM:x | BUS=:x
- *
- * Formato de out.txt:
- *   PG/<pg>
- *   INC:x/<pg>,<pl>
- *   DUP DIR:/<pg>,<pl>   (quando houve duplicação)
- *   REM:x/<qtd>,<pg>,<pl>
- *   BUS:x/<qtd>
- *   P:/<pg final>
- * ───────────────────────────────────────────────────────────── */
+/*
+  main.c — ponto de entrada do índice hash extensível
+ 
+  Lê operações de in.txt, executa no índice e escreve out.txt.
+ 
+  Formato de in.txt:
+    PG/<profundidade global inicial>
+    INC:x | REM:x | BUS=:x
+ 
+  Formato de out.txt:
+    PG/<pg>
+    INC:x/<pg>,<pl>
+    DUP DIR:/<pg>,<pl>   (quando houve duplicação)
+    REM:x/<qtd>,<pg>,<pl>
+    BUS:x/<qtd>
+    P:/<pg final>
+ */
 int main(void) {
     FILE *inFile  = fopen("in.txt",  "r");
     FILE *outFile = fopen("out.txt", "w");
@@ -29,7 +29,7 @@ int main(void) {
 
     char linha[256];
 
-    /* ── Lê primeira linha: PG/<profundidade> ── */
+    // Lê primeira linha: PG/<profundidade>
     if (!fgets(linha, sizeof(linha), inFile)) {
         fprintf(stderr, "Arquivo de entrada vazio.\n");
         fclose(inFile); fclose(outFile);
@@ -44,29 +44,29 @@ int main(void) {
         return 1;
     }
 
-    /* Escreve primeira linha no out.txt (igual à entrada) */
+    // Escreve primeira linha no out.txt (igual à entrada)
     fprintf(outFile, "%s\n", linha);
 
-    /* ── Cria/carrega diretório ── */
+    // Cria/carrega diretório
     Diretorio *dir = criarDiretorio(profGlobalInicial);
 
-    /* ── Processa operações linha a linha ── */
+    // Processa operações linha a linha
     while (fgets(linha, sizeof(linha), inFile)) {
         linha[strcspn(linha, "\r\n")] = 0;
-        if (strlen(linha) == 0) continue; /* ignora linhas vazias */
+        if (strlen(linha) == 0) continue; // ignora linhas vazias
 
         int x = 0;
 
         if (sscanf(linha, "INC:%d", &x) == 1) {
-            /* Inserção */
+            // Inserção
             inserir(dir, x, outFile);
 
         } else if (sscanf(linha, "REM:%d", &x) == 1) {
-            /* Remoção */
+            // Remoção
             remover(dir, x, outFile);
 
         } else if (sscanf(linha, "BUS=:%d", &x) == 1) {
-            /* Busca por igualdade */
+            // Busca por igualdade
             buscarIgualdade(dir, x, outFile);
 
         } else {
@@ -74,10 +74,10 @@ int main(void) {
         }
     }
 
-    /* ── Última linha: profundidade global final ── */
+    // Última linha: profundidade global final
     fprintf(outFile, "P:/%d\n", dir->profGlobal);
 
-    /* ── Persiste diretório e libera memória ── */
+    // Persiste diretório e libera memória
     salvarDiretorio(dir);
     liberarDiretorio(dir);
 
