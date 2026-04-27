@@ -154,12 +154,12 @@ void duplicarDiretorio(Diretorio *dir) {
 
     // Cada par (i, i + numEntradas/2) aponta para o mesmo bucket antigo
     for (int i = 0; i < dir->numEntradas; i++) {
-        novoIds[i]                    = dir->bucketIds[i];
+        novoIds[i] = dir->bucketIds[i];
         novoIds[i + dir->numEntradas] = dir->bucketIds[i];
     }
 
     free(dir->bucketIds);
-    dir->bucketIds   = novoIds;
+    dir->bucketIds = novoIds;
     dir->numEntradas = novoNum;
     dir->profGlobal++;
 }
